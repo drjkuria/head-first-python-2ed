@@ -1,3 +1,3 @@
 # Head First Python 2nd Edition
 
-Python code from Head First Python 2nd Edition (Paul Barry 2017). The examples are based on Python 3
+This repository contains the code for Head First Python 2nd Edition, by Paul Barry. It contains all the code files necessary to work through the book from start to finish.
