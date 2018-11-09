@@ -11,4 +11,9 @@ def hello() -> str:
 def do_search() -> str:
     return str(search_for_letters('life, the universe, and everything', 'eiru!'))
 
+@app.route('/entry')
+def entry_page() -> 'html':
+    return render_template('entry.html', 
+                            the_title='Welcome to search_for_letters on the web!')
+
 app.run()
