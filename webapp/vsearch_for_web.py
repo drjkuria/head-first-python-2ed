@@ -7,7 +7,7 @@ app = Flask(__name__)
 def hello() -> str:
     return 'Hello world from Flask!'
 
-@app.route('/search_for')
+@app.route('/search_for', methods=['POST'])
 def do_search() -> str:
     return str(search_for_letters('life, the universe, and everything', 'eiru!'))
 
