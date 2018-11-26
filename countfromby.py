@@ -6,3 +6,6 @@ class CountFromBy:
 
     def increase(self) -> None:
         self.val += self.incr
+
+    def __repr__(self) -> str:
+        return str(self.val)
