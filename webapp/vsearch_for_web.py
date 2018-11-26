@@ -6,14 +6,14 @@ app = Flask(__name__)
 
 def log_request(req: 'flask_request', res: str) -> None:
     """Log details of the web request and the results."""
-    debconfig = {
+    dbconfig = {
         'host': '127.0.0.1',
         'user': 'vsearch',
         'password': 'vsearchpasswd',
         'database': 'vsearchlogDB'
     }
 
-    conn = mysql.connector.connect(**debconfig)
+    conn = mysql.connector.connect(**dbconfig)
     cursor = conn.cursor()
     _SQL = """insert into log
               (phrase, letters, ip, browser_string, results)
