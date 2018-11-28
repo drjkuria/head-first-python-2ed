@@ -4,6 +4,13 @@ import mysql.connector
 
 app = Flask(__name__)
 
+app.config['dbconfig'] = {
+    'host': '127.0.0.1',
+    'user': 'vsearch',
+    'password': 'vsearchpasswd',
+    'database': 'vsearchlogDB'
+}
+
 def log_request(req: 'flask_request', res: str) -> None:
     """Log details of the web request and the results."""
     dbconfig = {
