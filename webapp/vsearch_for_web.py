@@ -68,5 +68,7 @@ def view_the_log() -> 'html':
                             the_row_titles=titles,
                             the_data=contents)
 
+app.secret_key = 'YouWillNeverGuessMySecretKey'
+
 if __name__ == '__main__':
     app.run(debug=True)
