@@ -56,6 +56,7 @@ def entry_page() -> 'html':
                             the_title='Welcome to search_for_letters on the web!')
 
 @app.route('/viewlog')
+@check_logged_in
 def view_the_log() -> 'html':
     """Display the contents of the log file as a HTML table."""
     with UseDatabase(app.config['dbconfig']) as cursor:
