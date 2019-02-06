@@ -15,6 +15,11 @@ def do_login() -> str:
     session['logged_in'] = True
     return 'You are now logged in.'
 
+@app.route('/logout')
+def do_logout() -> str:
+    session.pop('logged_in')
+    return 'You are now logged out.'
+
 def log_request(req: 'flask_request', res: str) -> None:
     """Log details of the web request and the results."""
     with UseDatabase(app.config['dbconfig']) as cursor:
@@ -62,7 +67,6 @@ def view_the_log() -> 'html':
                             the_title='View Log',
                             the_row_titles=titles,
                             the_data=contents)
-
 
 if __name__ == '__main__':
     app.run(debug=True)
