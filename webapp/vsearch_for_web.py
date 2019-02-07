@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, escape, session
 from vsearch import search_for_letters
-from DBcm import UseDatabase
+from DBcm import UseDatabase, ConnectionError
 from checker import check_logged_in
 
 app = Flask(__name__)
@@ -62,15 +62,21 @@ def entry_page() -> 'html':
 @check_logged_in
 def view_the_log() -> 'html':
     """Display the contents of the log file as a HTML table."""
-    with UseDatabase(app.config['dbconfig']) as cursor:
-        _SQL = """select phrase, letters, ip, browser_string, results from log"""
-        cursor.execute(_SQL)
-        contents = cursor.fetchall()
-    titles = ('Phrase', 'Letters', 'Remote_addr', 'User_agent', 'Results')
-    return render_template('viewlog.html',
-                            the_title='View Log',
-                            the_row_titles=titles,
-                            the_data=contents)
+    try:
+        with UseDatabase(app.config['dbconfig']) as cursor:
+            _SQL = """select phrase, letters, ip, browser_string, results from log"""
+            cursor.execute(_SQL)
+            contents = cursor.fetchall()
+        titles = ('Phrase', 'Letters', 'Remote_addr', 'User_agent', 'Results')
+        return render_template('viewlog.html',
+                                the_title='View Log',
+                                the_row_titles=titles,
+                                the_data=contents)
+    except ConnectionError as err:
+        print('Is your database switched on? Error:', str(err))
+    except Exception as err:
+        print('Something went wrong:', str(err))
+    return 'Error'
 
 app.secret_key = 'YouWillNeverGuessMySecretKey'
 
