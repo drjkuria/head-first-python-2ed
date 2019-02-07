@@ -3,6 +3,9 @@ import mysql.connector
 class ConnectionError(Exception):
     pass
 
+class CredentialsError(Exception):
+    pass
+
 class UseDatabase:
 
     def __init__(self, config: dict) -> None:
@@ -15,6 +18,8 @@ class UseDatabase:
             return self.cursor
         except mysql.connector.errors.InterfaceError as err:
             raise ConnectionError(err)
+        except mysql.connector.errors.ProgrammingError as err:
+            raise CredentialsError(err)
 
     def __exit__(self, exc_type, exc_value, exc_trace) -> None:
         self.conn.commit()
