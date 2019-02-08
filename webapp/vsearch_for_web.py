@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, escape, session
+from flask import copy_current_request_context
 from vsearch import search_for_letters
 from DBcm import UseDatabase, ConnectionError, CredentialsError, SQLError
 from checker import check_logged_in
@@ -22,30 +23,31 @@ def do_logout() -> str:
     session.pop('logged_in')
     return 'You are now logged out.'
 
-def log_request(req: 'flask_request', res: str) -> None:
-    """Log details of the web request and the results."""
-    sleep(15)   # This makes log_request really slow
-    with UseDatabase(app.config['dbconfig']) as cursor:
-        _SQL = """insert into log
-                  (phrase, letters, ip, browser_string, results)
-                  values
-                  (%s, %s, %s, %s, %s)
-        """
-        cursor.execute(_SQL, (req.form['phrase'],
-                            req.form['letters'],
-                            req.remote_addr,
-                            req.user_agent.browser,
-                            res, ))
-
 @app.route('/search_for', methods=['POST'])
 def do_search() -> 'html':
     """Extract the posted data; perform search; return results."""
+    @copy_current_request_context
+    def log_request(req: 'flask_request', res: str) -> None:
+        """Log details of the web request and the results."""
+        sleep(15)   # This makes log_request really slow
+        with UseDatabase(app.config['dbconfig']) as cursor:
+            _SQL = """insert into log
+                      (phrase, letters, ip, browser_string, results)
+                      values
+                      (%s, %s, %s, %s, %s)
+            """
+            cursor.execute(_SQL, (req.form['phrase'],
+                                req.form['letters'],
+                                req.remote_addr,
+                                req.user_agent.browser,
+                                res, ))
+
     phrase = request.form['phrase']
     letters = request.form['letters']
     title = 'Here are your results:'
     results = str(search_for_letters(phrase, letters))
     try:
-        t = Thread(target=log_request, args(request, results))
+        t = Thread(target=log_request, args=(request, results))
         t.start()
         log_request(request, results)
     except Exception as err:
@@ -54,7 +56,7 @@ def do_search() -> 'html':
                             the_title=title,
                             the_phrase=phrase,
                             the_letters=letters,
-                            the_results=results)
+                            the_results=results,)
 
 @app.route('/')
 @app.route('/entry')
@@ -76,7 +78,7 @@ def view_the_log() -> 'html':
         return render_template('viewlog.html',
                                 the_title='View Log',
                                 the_row_titles=titles,
-                                the_data=contents)
+                                the_data=contents,)
     except ConnectionError as err:
         print('Is your database switched on? Error:', str(err))
     except CredentialsError as err:
