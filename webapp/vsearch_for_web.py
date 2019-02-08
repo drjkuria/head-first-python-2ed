@@ -2,6 +2,8 @@ from flask import Flask, render_template, request, escape, session
 from vsearch import search_for_letters
 from DBcm import UseDatabase, ConnectionError, CredentialsError, SQLError
 from checker import check_logged_in
+from threading import Thread
+from time import sleep
 
 app = Flask(__name__)
 
@@ -22,6 +24,7 @@ def do_logout() -> str:
 
 def log_request(req: 'flask_request', res: str) -> None:
     """Log details of the web request and the results."""
+    sleep(15)   # This makes log_request really slow
     with UseDatabase(app.config['dbconfig']) as cursor:
         _SQL = """insert into log
                   (phrase, letters, ip, browser_string, results)
@@ -42,6 +45,8 @@ def do_search() -> 'html':
     title = 'Here are your results:'
     results = str(search_for_letters(phrase, letters))
     try:
+        t = Thread(target=log_request, args(request, results))
+        t.start()
         log_request(request, results)
     except Exception as err:
         print('***** Logging failed with this error:', str(err))
